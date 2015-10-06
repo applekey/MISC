@@ -8,7 +8,7 @@
 #include <vtkm/cont/internal/ArrayPortalFromIterators.h>
 #include <vector>
 
-#define SORT_SIZE 100
+#define EXAMPLE_SIZE 100
 
 template< typename DeviceAdapter, typename T >
 struct HelloWorld
@@ -48,8 +48,8 @@ int main(int argc, char** argv)
 
   //Create an input vector to be sorted
   std::vector<vtkm::Float32> ReversedInput;
-  ReversedInput.reserve( SORT_SIZE );
-  for (int i = SORT_SIZE; i > 0; i-- )
+  ReversedInput.reserve( EXAMPLE_SIZE );
+  for (int i = EXAMPLE_SIZE; i > 0; i-- )
   {
     ReversedInput.push_back( i );
   }
@@ -59,14 +59,14 @@ int main(int argc, char** argv)
 
   //Declare an output
   std::vector< vtkm::Float32> OutputData;
-  OutputData.reserve( SORT_SIZE );
+  OutputData.reserve( EXAMPLE_SIZE );
 
   //Run sorter on execution environment, once complete transfer
   //back to control environment
   helloWorld.Sort(&OutputData);
 
   //print the result on control environment
-  for (int i = 0; i < SORT_SIZE; i++ )
+  for (int i = 0; i < EXAMPLE_SIZE; i++ )
   {
     printf(" %f\n ", OutputData[i]);
   }
