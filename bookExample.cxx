@@ -13,13 +13,10 @@
 template< typename DeviceAdapter, typename T >
 struct HelloWorld
 {
-  std::vector<vtkm::Float32> * InputData;
   vtkm::cont::ArrayHandle <vtkm::Float32> InputArray;
 
   void Initilize(std::vector<vtkm::Float32> * inputData)
   {
-    this->InputData = inputData;
-
     vtkm::cont::ArrayHandle < vtkm::Float32 > tmpArray;
     tmpArray = vtkm::cont::make_ArrayHandle(*this->InputData);
     vtkm::cont::DeviceAdapterAlgorithm<DeviceAdapter>::Copy ( tmpArray ,this->InputArray);
