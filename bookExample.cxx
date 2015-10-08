@@ -8,28 +8,36 @@
 #include <vtkm/cont/internal/ArrayPortalFromIterators.h>
 #include <vector>
 
-#define EXAMPLE_SIZE 100
+#define SORT_SIZE 100
+
+using namespace vtkm::cont;
+
 
 template< typename DeviceAdapter, typename T >
-struct HelloWorld
+class HelloWorld
 {
-  vtkm::cont::ArrayHandle <vtkm::Float32> InputArray;
+public:
+  ArrayHandle <vtkm::Float32> InputArray;
 
   void Initilize(std::vector<vtkm::Float32> * inputData)
   {
-    vtkm::cont::ArrayHandle < vtkm::Float32 > tmpArray;
-    tmpArray = vtkm::cont::make_ArrayHandle(*this->InputData);
-    vtkm::cont::DeviceAdapterAlgorithm<DeviceAdapter>::Copy ( tmpArray ,this->InputArray);
+    ArrayHandle < vtkm::Float32 > tmpArray;
+    tmpArray = vtkm::cont::make_ArrayHandle(*inputData);
+    DeviceAdapterAlgorithm<DeviceAdapter>::Copy ( tmpArray ,this->InputArray);
   }
 
   void Sort(std::vector<vtkm::Float32> * outputData)
   {
     //Kick off sorting on execution environment
-    vtkm::cont::DeviceAdapterAlgorithm<DeviceAdapter>::Sort(this->InputArray);
-
-    typename vtkm::cont::ArrayHandle<T>::PortalControl readwritePortal = this->InputArray.GetPortalControl ();
+    DeviceAdapterAlgorithm<DeviceAdapter>::Sort(this->InputArray);
     //Copy back results from execution environment to control environment
-    std::copy(vtkm::cont::ArrayPortalToIteratorBegin(readwritePortal), vtkm::cont::ArrayPortalToIteratorEnd(readwritePortal), outputData->begin());
+
+    typename ArrayHandle<T>::PortalConstControl readPortal = this->InputArray.GetPortalConstControl();
+
+    for ( vtkm :: Id index = 0; index < readPortal.GetNumberOfValues(); index ++)
+    {
+      (*outputData)[index] = readPortal.Get(index);
+    }
   }
 };
 
@@ -39,7 +47,7 @@ int main(int argc, char** argv)
 {
 
   // Query which device we are currently running on
-  typedef vtkm::cont::internal::DeviceAdapterTraits<DeviceAdapter> DeviceAdapterTraits;
+  typedef internal::DeviceAdapterTraits<DeviceAdapter> DeviceAdapterTraits;
   std::cout << "Running Hello World example on device adapter: "
             << DeviceAdapterTraits::GetId() << std::endl;
 
@@ -48,8 +56,8 @@ int main(int argc, char** argv)
 
   //Create an input vector to be sorted
   std::vector<vtkm::Float32> ReversedInput;
-  ReversedInput.reserve( EXAMPLE_SIZE );
-  for (int i = EXAMPLE_SIZE; i > 0; i-- )
+  ReversedInput.reserve( SORT_SIZE );
+  for (int i = SORT_SIZE; i > 0; i-- )
   {
     ReversedInput.push_back( i );
   }
@@ -59,17 +67,15 @@ int main(int argc, char** argv)
 
   //Declare an output
   std::vector< vtkm::Float32> OutputData;
-  OutputData.reserve( EXAMPLE_SIZE );
+  OutputData.reserve( SORT_SIZE );
 
   //Run sorter on execution environment, once complete transfer
   //back to control environment
   helloWorld.Sort(&OutputData);
 
   //print the result on control environment
-  for (int i = 0; i < EXAMPLE_SIZE; i++ )
+  for (int i = 0; i < SORT_SIZE; i++ )
   {
     printf(" %f\n ", OutputData[i]);
   }
-
 }
-
