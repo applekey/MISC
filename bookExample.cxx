@@ -12,27 +12,33 @@
 
 using namespace vtkm::cont;
 
-
-template< typename DeviceAdapter, typename T >
+template<typename T,typename DeviceAdapter = 
+                    VTKM_DEFAULT_DEVICE_ADAPTER_TAG >
 class HelloWorld
 {
-public:
+  public:
+  std::vector<vtkm::Float32> * InputData;
   ArrayHandle <vtkm::Float32> InputArray;
 
   void Initilize(std::vector<vtkm::Float32> * inputData)
   {
+    this->InputData = inputData;
+
     ArrayHandle < vtkm::Float32 > tmpArray;
-    tmpArray = vtkm::cont::make_ArrayHandle(*inputData);
-    DeviceAdapterAlgorithm<DeviceAdapter>::Copy ( tmpArray ,this->InputArray);
+    tmpArray = vtkm::cont::make_ArrayHandle(*this->InputData);
+    DeviceAdapterAlgorithm<DeviceAdapter>::
+                            Copy(tmpArray, this->InputArray);
   }
 
   void Sort(std::vector<vtkm::Float32> * outputData)
   {
-    //Kick off sorting on execution environment
+    //Start sorting on execution environment
     DeviceAdapterAlgorithm<DeviceAdapter>::Sort(this->InputArray);
-    //Copy back results from execution environment to control environment
 
-    typename ArrayHandle<T>::PortalConstControl readPortal = this->InputArray.GetPortalConstControl();
+    //Copy results from execution environment to control environment
+
+    typename ArrayHandle<T>::PortalConstControl readPortal =
+      this->InputArray.GetPortalConstControl();
 
     for ( vtkm :: Id index = 0; index < readPortal.GetNumberOfValues(); index ++)
     {
@@ -49,21 +55,21 @@ int main(int argc, char** argv)
   // Query which device we are currently running on
   typedef internal::DeviceAdapterTraits<DeviceAdapter> DeviceAdapterTraits;
   std::cout << "Running Hello World example on device adapter: "
-            << DeviceAdapterTraits::GetId() << std::endl;
+  << DeviceAdapterTraits::GetId() << std::endl;
 
   //Initilize control/execution sorter with appropiate device adapter
   HelloWorld< DeviceAdapter, vtkm::Float32 > helloWorld;
 
   //Create an input vector to be sorted
-  std::vector<vtkm::Float32> ReversedInput;
-  ReversedInput.reserve( SORT_SIZE );
-  for (int i = SORT_SIZE; i > 0; i-- )
+  std::vector<vtkm::Float32> RandomInput;
+  RandomInput.reserve( SORT_SIZE );
+  for (int i = 0; i < SORT_SIZE; i++ )
   {
-    ReversedInput.push_back( i );
+    RandomInput.push_back( rand() );
   }
 
-  // Initlize sorter with input vector
-  helloWorld.Initilize(&ReversedInput);
+  // Initialize sorter with input vector
+  helloWorld.Initilize(&RandomInput);
 
   //Declare an output
   std::vector< vtkm::Float32> OutputData;
@@ -78,4 +84,5 @@ int main(int argc, char** argv)
   {
     printf(" %f\n ", OutputData[i]);
   }
+
 }
