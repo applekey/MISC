@@ -96,8 +96,8 @@ class Solution(object):
                     else:
                         heights.append(lftHeight)
                     heights.sort()
-            result.append(points)
-        return result[0]
+            result += points
+        return result
 
 
 
@@ -108,7 +108,7 @@ class Solution(object):
 
 sol = Solution();
 
-input = [[0,2,3],[2,5,3]]
+input = [ [2 ,9 ,10], [3, 7 ,15], [5, 12 ,12], [15 ,20, 10], [19, 24 ,8] ]
 print sol.getSkyline(input)
 
 
