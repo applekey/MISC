@@ -1,20 +1,28 @@
-def isPlus(s):
-    if s == "+":
-        return 1
-    else:
-        return 0
-
-def reducePlus(ans):
-    totalIslands = 0
-    head = ans[1]
-
-    for i in ans[1:]:
-        if i != head:# there is a flip
-            totalIslands +=1
-        head = i
-    return totalIslands/2 +1
-
 class Solution(object):
+    def nxtMoves(self,s,AorB):
+        moves = self.generatePossibleNextMoves(s)
+        if len(moves) == 0:
+            if AorB: ## its A's turn and there are no more moves
+                return 1
+            else:
+                return 0 ## a wins
+        ans = map(lambda x:self.nxtMoves(x,not AorB),moves)
+        return reduce(lambda x,y:x+y,ans)
+
+    def generatePossibleNextMoves(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        ans = []
+        if len(s) < 2:
+            return ans
+        for idx,val in enumerate(s[1:]):
+            ridx = idx+1
+            if val == s[ridx-1] and val == '+':
+                cpy = s[:ridx-1] +"--"+ s[ridx+1:]
+                ans.append(cpy)
+        return ans
     def canWin(self, s):
         """
         :type s: str
@@ -22,29 +30,21 @@ class Solution(object):
         """
         if s == "":
             return False
+        moves = self.generatePossibleNextMoves(s)
 
-        plus = map(isPlus,s)
-        numPlus = reduce(lambda x,y: x+y,plus)
-
-        if numPlus <2:
+        if len(moves) == 0:
             return False
 
-        extra = reducePlus(s) -1
+        ans = map(lambda x:self.nxtMoves(x,False),moves)
 
-        numPlus -= extra
-        print numPlus
+        willWork = False
+        for a in ans:
+            if a == 0:
+                willWork = True
+                break
+        return willWork
 
-        if numPlus == 2:
-            return True
-
-        if numPlus % 4 != 1:
-            return False
-        else:
-            return True
-
-
-
-input = '++'
+input = "++++++-++++++-++++++"
 a = Solution()
 print a.canWin(input)
 # class Solution(object):
