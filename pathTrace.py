@@ -66,18 +66,30 @@ def kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,k,kend,depth,kdTree,goLeft):
 
     ## split by X
     if splitStartIndex == splitStartEndIndex: # only 1 left, so value node
-        valueNode = kdTreeNode(-1,triList[i])
+        valueNode = kdTreeNode(-1,triList[splitStartIndex])
         leftRight(kdTree,goLeft,valueNode)
     else:
         ## split
         # create a node to represent the split
 
-        mid = (i+j)/2
-        splitA = kdTreeNode(split,mid)
+        if split == 0:
+            mid = (i+iend)/2
+        elif split == 1:
+            mid = (j+jend)/2
+        else:
+            mid = (k+kend)/2
+        splitA = kdTreeNode(split,triList[mid][split])
         leftRight(kdTree,goLeft,splitA)
 
-        kdTreeHelper(xVerts,yVerts,zVerts,i,mid,j,jend,k,kend,depth+1,splitA,True)
-        kdTreeHelper(xVerts,yVerts,zVerts,mid+1,iend,j,jend,k,kend,depth+1,splitA,False)
+        if split == 0:
+            kdTreeHelper(xVerts,yVerts,zVerts,i,mid,j,jend,k,kend,depth+1,splitA,True)
+            kdTreeHelper(xVerts,yVerts,zVerts,mid+1,iend,j,jend,k,kend,depth+1,splitA,False)
+        elif split == 1:
+            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,mid,k,kend,depth+1,splitA,True)
+            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,mid+1,jend,k,kend,depth+1,splitA,False)
+        elif split == 2:
+            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,mid,k,depth+1,splitA,True)
+            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,mid+1,kend,depth+1,splitA,False)
 
 def kdTree(verts):
 #split depth
@@ -91,14 +103,14 @@ def kdTree(verts):
     bounds = [sortedX[0],sortedX[-1],sortedY[0],sortedY[-1],sortedZ[0],sortedZ[-1]]
     tree = kdHeadNode(bounds)
 
-    margs = [sortedX,sortedY,sortedZ,0,len(sortedX),0,len(sortedY),0,len(sortedZ),0, tree, True]
-    print len(margs)
+    margs = [sortedX,sortedY,sortedZ,0,len(sortedX)-1,0,len(sortedY)-1,0,len(sortedZ)-1,0, tree, True]
     start = True
     kdTreeHelper(*margs)
     return tree
 
 
-faces = loadOBJ('/Users/applekey/Documents/obj/bunny.obj')
+faces = loadOBJ('/Users/applekey/Documents/obj/box.obj')
 #print faces
 
-kdTree(faces)
+kdT = kdTree(faces)
+print kdT
