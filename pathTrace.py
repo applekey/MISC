@@ -53,6 +53,8 @@ def kdTreeHelper(verts,depth,kdTree,goLeft):
 
     ## split by X
     if len(verts) == 1: # only 1 left, so value node
+        print 'here'
+        print verts
         valueNode = kdTreeNode(-1,verts[0])
         leftRight(kdTree,goLeft,valueNode)
         return
@@ -76,14 +78,14 @@ def kdTreeHelper(verts,depth,kdTree,goLeft):
 
         if len(rightList) == 0 or len(leftList) == 0:
             ##add a new node for all of them
+
             valueNode = kdTreeNode(-1,verts)
-            leftRight(kdTree,goLeft,splitNode)
+            leftRight(splitNode,not goLeft,valueNode)
 
         else:
             kdTreeHelper(rightList,depth+1,splitNode,True)
             kdTreeHelper(leftList,depth+1,splitNode,False)
         return
-
 
 def kdTree(verts):
     tree = kdHeadNode()
@@ -91,12 +93,25 @@ def kdTree(verts):
     kdTreeHelper(verts,0,tree,True)
     return tree
 
+def verifyTree(tree):
+    lft = tree.left
+    right = tree.right
+    count = 0
+    if lft == None and right == None:
+        if isinstance(tree.value, list):
+            return len(tree.value)
+        else:
+            return 1
+    else:
 
-faces = loadOBJ('/Users/applekey/Documents/obj/sphere.obj')
-#create kd tree
-kdT = kdTree(faces)
+        if lft != None:
+            count += verifyTree(lft)
+        if right != None:
+            count += verifyTree(right)
+        return count
 
-#swap rays
+
+
 
 class ray():
     def __init__(self,position,direction):
@@ -108,3 +123,12 @@ def rayBouncer(x):
 def drawImage(kdT,screenX,screenY,transform):
     ## spawn ortho rays for now
     map(lambda x: rayBouncer(x),range(screenX*screenY))
+
+def main():
+    faces = loadOBJ('/Users/applekey/Documents/obj/sphere.obj')
+    #create kd tree
+    print len(faces)
+    kdt = kdTree(faces)
+    print verifyTree(kdt)
+
+main()
