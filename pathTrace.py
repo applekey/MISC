@@ -1,5 +1,6 @@
 def findMed(verts,index):
     vertSorted = sorted(verts, key=lambda vert: vert[index])
+
     return vertSorted[len(vertSorted)/2]
 
 def loadOBJ(filename):
@@ -52,13 +53,13 @@ def kdTreeHelper(verts,depth,kdTree,goLeft):
 
     ## split by X
     if len(verts) == 1: # only 1 left, so value node
-        valueNode = kdTreeNode(-1,verts[splitStartIndex])
+        valueNode = kdTreeNode(-1,verts[0])
         leftRight(kdTree,goLeft,valueNode)
+        return
     else:
         ## split
         # create a node to represent the split
         med = findMed(verts, split )
-
 
         splitNode = kdTreeNode(split,med[split])
         leftRight(kdTree,goLeft,splitNode)
@@ -68,13 +69,20 @@ def kdTreeHelper(verts,depth,kdTree,goLeft):
         rightList = []
         leftList = []
         for vert in verts:
-            if vert[split] > med:
+            if vert[split] > med[split]:
                 rightList.append(vert)
             else:
                 leftList.append(vert)
 
-        kdTreeHelper(rightList,depth+1,splitNode,True)
-        kdTreeHelper(leftList,depth+1,splitNode,False)
+        if len(rightList) == 0 or len(leftList) == 0:
+            ##add a new node for all of them
+            valueNode = kdTreeNode(-1,verts)
+            leftRight(kdTree,goLeft,splitNode)
+
+        else:
+            kdTreeHelper(rightList,depth+1,splitNode,True)
+            kdTreeHelper(leftList,depth+1,splitNode,False)
+        return
 
 
 def kdTree(verts):
