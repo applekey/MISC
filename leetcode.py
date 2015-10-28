@@ -1,7 +1,7 @@
 class Solution(object):
     def recMidSearch(self,lista,listb,kthSmallest,firstTime):
-        #print lista
-        #print listb
+        print lista
+        print listb
         lenA = len(lista)
         lenB = len(listb)
 
@@ -12,27 +12,30 @@ class Solution(object):
                 print 'toolong ... thats what she said'
                 return
 
-            if kthSmallest == 1:
-                return
+            if kthSmallest == 0:
+                return lista[0] if lista[0]< listb[1] else listb[1]
             if lenA < kthSmallest+1:
                 ka = lenA-1
-                kb = kthSmallest+1-lenA -1
+                kb = kthSmallest-ka -1
+                print 'fdsa'
+                print ka
+                print kb
             else:
                 ka = kthSmallest/2
-                kb = kthSmallest - ka
+                kb = kthSmallest - ka -1
+                print ka
+                print kb
         else:
-            ka = lenA/2
-            kb = lenB/2
+            ka = lenA/2 -1
+            kb = lenB/2 -1
 
 
         ## figure out that shit...
         if lenA == lenB and lenA == 1:
             ## which one do i return
             return lista[0]
-        if ((lenA == 2 and lenB == 1) or (lenA == 1 and lenB == 2)):
-            print lista
-            print listb
-            return
+        if lenA == 1 or lenB == 1:
+            return lista[-1] if lista[-1]> listb[-1] else listb[-1]
             #return  lista
 
         # k/2 elemnt for both
