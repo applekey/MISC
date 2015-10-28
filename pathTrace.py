@@ -1,3 +1,7 @@
+def findMed(verts,index):
+    vertSorted = sorted(verts, key=lambda vert: vert[index])
+    return vertSorted[len(vertSorted)/2]
+
 def loadOBJ(filename):
     numVerts = 0
     verts = []
@@ -23,8 +27,7 @@ def loadOBJ(filename):
 
 
 class kdHeadNode:
-    def __init__(self,bounds):
-        self.bounds = bounds
+    def __init__(self):
         self.left = None
         self.right = None
 
@@ -44,73 +47,56 @@ def leftRight(node,lftRight,childNode):
         node.right = childNode
 
 ## i j k indicies
-def kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,k,kend,depth,kdTree,goLeft):
+def kdTreeHelper(verts,depth,kdTree,goLeft):
     split = depth % 3
 
-    splitStartIndex = -1
-    splitStartEndIndex = -1
-    triList = None
-    verts = []
-    if split == 0:
-        splitStartIndex = i
-        splitStartEndIndex = iend
-        triList = xVerts
-    if split == 1:
-        splitStartIndex = j
-        splitStartEndIndex = jend
-        triList = yVerts
-    if split == 2:
-        splitStartIndex = k
-        splitStartEndIndex = kend
-        triList = zVerts
-
     ## split by X
-    if splitStartIndex == splitStartEndIndex: # only 1 left, so value node
-        valueNode = kdTreeNode(-1,triList[splitStartIndex])
+    if len(verts) == 1: # only 1 left, so value node
+        valueNode = kdTreeNode(-1,verts[splitStartIndex])
         leftRight(kdTree,goLeft,valueNode)
     else:
         ## split
         # create a node to represent the split
+        med = findMed(verts, split )
 
-        if split == 0:
-            mid = (i+iend)/2
-        elif split == 1:
-            mid = (j+jend)/2
-        else:
-            mid = (k+kend)/2
-        splitA = kdTreeNode(split,triList[mid][split])
-        leftRight(kdTree,goLeft,splitA)
 
-        if split == 0:
-            kdTreeHelper(xVerts,yVerts,zVerts,i,mid,j,jend,k,kend,depth+1,splitA,True)
-            kdTreeHelper(xVerts,yVerts,zVerts,mid+1,iend,j,jend,k,kend,depth+1,splitA,False)
-        elif split == 1:
-            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,mid,k,kend,depth+1,splitA,True)
-            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,mid+1,jend,k,kend,depth+1,splitA,False)
-        elif split == 2:
-            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,mid,k,depth+1,splitA,True)
-            kdTreeHelper(xVerts,yVerts,zVerts,i,iend,j,jend,mid+1,kend,depth+1,splitA,False)
+        splitNode = kdTreeNode(split,med[split])
+        leftRight(kdTree,goLeft,splitNode)
+        ## find the median
+
+
+        rightList = []
+        leftList = []
+        for vert in verts:
+            if vert[split] > med:
+                rightList.append(vert)
+            else:
+                leftList.append(vert)
+
+        kdTreeHelper(rightList,depth+1,splitNode,True)
+        kdTreeHelper(leftList,depth+1,splitNode,False)
+
 
 def kdTree(verts):
-#split depth
-    depth = 4
-    #
+    tree = kdHeadNode()
 
-    sortedX = sorted(verts, key=lambda vert: vert[0])
-    sortedY = sorted(verts, key=lambda vert: vert[1])
-    sortedZ = sorted(verts, key=lambda vert: vert[2])
-
-    bounds = [sortedX[0],sortedX[-1],sortedY[0],sortedY[-1],sortedZ[0],sortedZ[-1]]
-    tree = kdHeadNode(bounds)
-
-    margs = [sortedX,sortedY,sortedZ,0,len(sortedX)-1,0,len(sortedY)-1,0,len(sortedZ)-1,0, tree, True]
-    start = True
-    kdTreeHelper(*margs)
+    kdTreeHelper(verts,0,tree,True)
     return tree
 
 
-faces = loadOBJ('/Users/applekey/Documents/obj/box.obj')
-#print faces
-
+faces = loadOBJ('/Users/applekey/Documents/obj/sphere.obj')
+#create kd tree
 kdT = kdTree(faces)
-print kdT
+
+#swap rays
+
+class ray():
+    def __init__(self,position,direction):
+        pass
+
+def rayBouncer(x):
+    pass
+
+def drawImage(kdT,screenX,screenY,transform):
+    ## spawn ortho rays for now
+    map(lambda x: rayBouncer(x),range(screenX*screenY))
