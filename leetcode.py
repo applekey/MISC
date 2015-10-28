@@ -1,52 +1,112 @@
 class Solution(object):
-    def nxtMoves(self,s,AorB):
-        moves = self.generatePossibleNextMoves(s)
-        if len(moves) == 0:
-            if AorB: ## its A's turn and there are no more moves
-                return 1
+    def recMidSearch(self,lista,listb,kthSmallest,firstTime):
+        #print lista
+        #print listb
+        lenA = len(lista)
+        lenB = len(listb)
+
+        if firstTime:
+            totalLength = lenA + lenB
+
+            if totalLength < kthSmallest +1:
+                print 'toolong ... thats what she said'
+                return
+
+            if kthSmallest == 1:
+                return
+            if lenA < kthSmallest+1:
+                ka = lenA-1
+                kb = kthSmallest+1-lenA -1
             else:
-                return 0 ## a wins
-        ans = map(lambda x:self.nxtMoves(x,not AorB),moves)
-        return reduce(lambda x,y:x+y,ans)
+                ka = kthSmallest/2
+                kb = kthSmallest - ka
+        else:
+            ka = lenA/2
+            kb = lenB/2
 
-    def generatePossibleNextMoves(self, s):
+
+        ## figure out that shit...
+        if lenA == lenB and lenA == 1:
+            ## which one do i return
+            return lista[0]
+        if ((lenA == 2 and lenB == 1) or (lenA == 1 and lenB == 2)):
+            print lista
+            print listb
+            return
+            #return  lista
+
+        # k/2 elemnt for both
+        if lista[ka] < listb[kb]:
+            #....axxx
+            #xxxxb....
+            return self.recMidSearch(lista[ka:kthSmallest+1],listb[:kb+1],kthSmallest,False)
+        else:
+            return self.recMidSearch(lista[:ka+1],listb[kb:kthSmallest+1],kthSmallest,False)
+
+    def findMedianSortedArrays(self, nums1, nums2,smallest):
         """
-        :type s: str
-        :rtype: List[str]
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
         """
-        ans = []
-        if len(s) < 2:
-            return ans
-        for idx,val in enumerate(s[1:]):
-            ridx = idx+1
-            if val == s[ridx-1] and val == '+':
-                cpy = s[:ridx-1] +"--"+ s[ridx+1:]
-                ans.append(cpy)
-        return ans
-    def canWin(self, s):
-        """
-        :type s: str
-        :rtype: bool
-        """
-        if s == "":
-            return False
-        moves = self.generatePossibleNextMoves(s)
+        return self.recMidSearch(nums1,nums2,smallest,True)
 
-        if len(moves) == 0:
-            return False
+## need to find the ith elemnt
 
-        ans = map(lambda x:self.nxtMoves(x,False),moves)
-
-        willWork = False
-        for a in ans:
-            if a == 0:
-                willWork = True
-                break
-        return willWork
-
-input = "++++++-++++++-++++++"
+nums1 = [0, 1,2,3]
+nums2 = [4,5,6,7,8,9]
 a = Solution()
-print a.canWin(input)
+print a.findMedianSortedArrays(nums1,nums2,1)
+
+# class Solution(object):
+#     def nxtMoves(self,s,AorB):
+#         moves = self.generatePossibleNextMoves(s)
+#         if len(moves) == 0:
+#             if AorB: ## its A's turn and there are no more moves
+#                 return 1
+#             else:
+#                 return 0 ## a wins
+#         ans = map(lambda x:self.nxtMoves(x,not AorB),moves)
+#         return reduce(lambda x,y:x+y,ans)
+#
+#     def generatePossibleNextMoves(self, s):
+#         """
+#         :type s: str
+#         :rtype: List[str]
+#         """
+#         ans = []
+#         if len(s) < 2:
+#             return ans
+#         for idx,val in enumerate(s[1:]):
+#             ridx = idx+1
+#             if val == s[ridx-1] and val == '+':
+#                 cpy = s[:ridx-1] +"--"+ s[ridx+1:]
+#                 ans.append(cpy)
+#         return ans
+#     def canWin(self, s):
+#         """
+#         :type s: str
+#         :rtype: bool
+#         """
+#         if s == "":
+#             return False
+#         moves = self.generatePossibleNextMoves(s)
+#
+#         if len(moves) == 0:
+#             return False
+#
+#         ans = map(lambda x:self.nxtMoves(x,False),moves)
+#
+#         willWork = False
+#         for a in ans:
+#             if a == 0:
+#                 willWork = True
+#                 break
+#         return willWork
+#
+# input = "++++++-++++++-++++++"
+# a = Solution()
+# print a.canWin(input)
 # class Solution(object):
 #     def generatePossibleNextMoves(self, s):
 #         """
