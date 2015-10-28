@@ -17,14 +17,9 @@ class Solution(object):
             if lenA < kthSmallest+1:
                 ka = lenA-1
                 kb = kthSmallest-ka -1
-                print 'fdsa'
-                print ka
-                print kb
             else:
                 ka = kthSmallest/2
                 kb = kthSmallest - ka -1
-                print ka
-                print kb
         else:
             ka = lenA/2 -1
             kb = lenB/2 -1
@@ -33,17 +28,26 @@ class Solution(object):
         ## figure out that shit...
         if lenA == lenB and lenA == 1:
             ## which one do i return
-            return lista[0]
-        if lenA == 1 or lenB == 1:
-            return lista[-1] if lista[-1]> listb[-1] else listb[-1]
-            #return  lista
+            return listb[0]
 
+        if lenA == 1:
+            print 'a'
+            print lista
+            print listb
+            return lista[-1] if lista[-1]> listb[-1] else listb[-1]
+        if lenB == 1:
+            print 'a'
+            print lista
+            print listb
+            return listb[-1] if lista[-1]> listb[-1] else lista[-1]
+            #return  lista
+        print str(ka) + '  ' + str(kb)
         # k/2 elemnt for both
         if lista[ka] < listb[kb]:
-            #....axxx
-            #xxxxb....
+            print 'dfd'
             return self.recMidSearch(lista[ka:kthSmallest+1],listb[:kb+1],kthSmallest,False)
         else:
+            print 'fdsa'
             return self.recMidSearch(lista[:ka+1],listb[kb:kthSmallest+1],kthSmallest,False)
 
     def findMedianSortedArrays(self, nums1, nums2,smallest):
@@ -56,8 +60,8 @@ class Solution(object):
 
 ## need to find the ith elemnt
 
-nums1 = [0, 1,2,3]
-nums2 = [4,5,6,7,8,9]
+nums1 = [0, 2,4,6]
+nums2 = [-1,1,3,5,7,9]
 a = Solution()
 print a.findMedianSortedArrays(nums1,nums2,1)
 
