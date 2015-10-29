@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+def vecNorm(myvec):
+    return math.sqrt(math.pow(myvec[0],2) + math.pow(myvec[1],2))
+
 def CreateSurface():
     #draw half a sphere
     points = []
@@ -20,6 +23,28 @@ def CreateSurface():
 
     return points
 
+class ray:
+    def __init__(position,direction):
+        self.position = position
+        self.direction = direction
+
+def findCorrectEdgeRay(edges,ray):
+    #construct aabb for each edge
+    aabb = []
+    for edge in edges:
+        minleft = [min(edges[0][0],edges[1][0]), min(edges[0][1],edges[1][1])]
+        maxTop = [max(edges[0][0],edges[1][0]), max(edges[0][1],edges[1][1])]
+
+        ## check if the ray intersects the aabb
+        bottomIntersection = (minLeft[1] - ray.origin[1]) / ray.direction[1] * ray.direction[0]
+        topIntersection = (maxTop[1] - ray.origin[1]) / ray.direction[1] * ray.direction[0]
+
+        if ((bottomIntersection > minLeft[0] and bottomIntersection < maxTop[0])
+            or(topIntersection > minLeft[0] and topIntersection < maxTop[0])):
+
+            return edge
+    print 'not found'
+    return None
 def findCorrectEdge(edges,xIndex):
     #print xIndex
     found = False
@@ -39,9 +64,18 @@ def TraceSpecular(edges):
     end = 10.0
     colors = []
     lightPos = [10,15]
+    ## camera stuff
+    camPos = [15,0]
+    camNear = 5
+    camFov = 30.0
     for i in range(samples):
+        angle = -camFov/2.0 + camFov/samples * float(i)
+        direction = [math.sin(math.radians(angle)), - 1.0]
+        #create the ray
+        sampleRay = ray(camPos,vecNorm(direction))
+
         xIndex = start + (end-start)/samples * i + random.uniform(0,0.3)
-        edge = findCorrectEdge(edges,xIndex)
+        edge = findCorrectEdgeRay(edges,sampleRay)
 
         if edge == None:
             continue
@@ -112,6 +146,7 @@ def main():
     ## create edges
     plen = len(points)
     print plen
+
     skip = 6
     for s in range(skip):
         for i in range(plen)[10+s::skip]:
