@@ -50,11 +50,10 @@ def leftRight(node,lftRight,childNode):
 ## i j k indicies
 def kdTreeHelper(verts,depth,kdTree,goLeft):
     split = depth % 3
-
+    #print verts
     ## split by X
     if len(verts) == 1: # only 1 left, so value node
         print 'here'
-        print verts
         valueNode = kdTreeNode(-1,verts[0])
         leftRight(kdTree,goLeft,valueNode)
         return
@@ -76,12 +75,11 @@ def kdTreeHelper(verts,depth,kdTree,goLeft):
             else:
                 leftList.append(vert)
 
-        if len(rightList) == 0 or len(leftList) == 0:
+        if len(rightList) == 0:
             ##add a new node for all of them
-
-            valueNode = kdTreeNode(-1,verts)
-            leftRight(splitNode,not goLeft,valueNode)
-
+            kdTreeHelper(leftList,depth+1,splitNode,False)
+        elif len(leftList) == 0:
+            kdTreeHelper(rightList,depth+1,splitNode,True)
         else:
             kdTreeHelper(rightList,depth+1,splitNode,True)
             kdTreeHelper(leftList,depth+1,splitNode,False)
@@ -125,10 +123,11 @@ def drawImage(kdT,screenX,screenY,transform):
     map(lambda x: rayBouncer(x),range(screenX*screenY))
 
 def main():
-    faces = loadOBJ('/Users/applekey/Documents/obj/sphere.obj')
+    faces = loadOBJ('/Users/applekey/Documents/obj/box.obj')
+    print faces
     #create kd tree
-    print len(faces)
-    kdt = kdTree(faces)
-    print verifyTree(kdt)
+    #print len(faces)
+    #kdt = kdTree(faces)
+    #print verifyTree(kdt)
 
 main()
