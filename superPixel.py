@@ -2,10 +2,13 @@
 import math
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+import random
+
 def CreateSurface():
     #draw half a sphere
     points = []
-    radius = 10.0
+    radius = 15.0
     granularity = 500
 
     anglePerSlice =  180.0/granularity
@@ -30,7 +33,27 @@ def findCorrectEdge(edges,xIndex):
     #print xIndex
     print 'notfound'
 
-def Trace(edges):
+def TraceSpecular(edges):
+    samples = 1000
+    start = -10.0
+    end = 10.0
+    colors = []
+    lightPos = [10,15]
+    for i in range(samples):
+        xIndex = start + (end-start)/samples * i + random.uniform(0,0.3)
+        edge = findCorrectEdge(edges,xIndex)
+
+        if edge == None:
+            continue
+        pYpos =  edge[0][1] + (-edge[0][0] + xIndex)/(edge[1][0] - edge[0][0]) * (edge[1][1] - edge[0][1])
+        slope = [(edge[0][1] - edge[1][1]),(edge[0][0] - edge[1][0])]
+        normal = slope
+        normal[0] = -normal[0]
+
+
+
+
+def TraceDiffuse(edges):
     samples = 1000
     start = -10.0
     end = 10.0
@@ -38,7 +61,7 @@ def Trace(edges):
     lightPos = [10,15]
 
     for i in range(samples):
-        xIndex = start + (end-start)/samples * i
+        xIndex = start + (end-start)/samples * i + random.uniform(0,0.3)
         edge = findCorrectEdge(edges,xIndex)
         ## calculate lambert
             #interpolate y position
@@ -59,29 +82,47 @@ def Trace(edges):
     return colors
 
 def output(colors):
-    lenColors = len(colors)
+    lenColors = len(colors[0])
     height = 400
     blank_image = np.zeros((height,lenColors,1), np.uint8)
-    for j in range(height):
-        for i in range(lenColors):
-            blank_image[j][i] = colors[i]
-    cv2.imshow('image',blank_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
+    for i in range(lenColors):
+        color = 0
+        #color = colors[0][i]
+        for m in range(len(colors)):
+            color +=colors[m][i]
+        color = color /float(len(colors))
+        for j in range(height):
+            blank_image[j][i] = color
+
+    x = [i for i in range(lenColors)]
+    y = [blank_image[0][i] for i in range(lenColors)]
+    plt.scatter(x, y)
+    plt.show()
+    cv2.imwrite('/Users/applekey/Desktop/c.png',blank_image)
+
+    # cv2.imshow('image',blank_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 def main():
     points  = CreateSurface()
     edges = []
-
+    allColors = []
     ## create edges
     plen = len(points)
-    skip = 2
-    for i in range(plen)[10::skip]:
-        edges.append([points[i-skip],points[i]])
+    print plen
+    skip = 6
+    for s in range(skip):
+        for i in range(plen)[10+s::skip]:
+            edges.append([points[i-skip],points[i]])
+        print len(edges)
 
-    # for edge in edges:
-    #     print str(edge[0][0]) + ' ' + str(edge[1][0])
+        # for edge in edges:
+        #     print str(edge[0][0]) + ' ' + str(edge[1][0])
 
-    colors = Trace(edges)
-    output(colors)
+        colors = TraceDiffuse(edges)
+        allColors.append(colors)
+        edges = []
+    output(allColors)
 main()
