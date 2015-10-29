@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import random
 
 def vecNorm(myvec):
-    return math.sqrt(math.pow(myvec[0],2) + math.pow(myvec[1],2))
+    mag =  math.sqrt(math.pow(myvec[0],2) + math.pow(myvec[1],2))
+    return [myvec[0]/mag,myvec[1]/mag]
 
 def CreateSurface():
     #draw half a sphere
@@ -24,16 +25,16 @@ def CreateSurface():
     return points
 
 class ray:
-    def __init__(position,direction):
-        self.position = position
+    def __init__(self,origin,direction):
+        self.origin = origin
         self.direction = direction
 
 def findCorrectEdgeRay(edges,ray):
     #construct aabb for each edge
     aabb = []
     for edge in edges:
-        minleft = [min(edges[0][0],edges[1][0]), min(edges[0][1],edges[1][1])]
-        maxTop = [max(edges[0][0],edges[1][0]), max(edges[0][1],edges[1][1])]
+        minLeft = [min(edge[0][0],edge[1][0]), min(edge[0][1],edge[1][1])]
+        maxTop = [max(edge[0][0],edge[1][0]), max(edge[0][1],edge[1][1])]
 
         ## check if the ray intersects the aabb
         bottomIntersection = (minLeft[1] - ray.origin[1]) / ray.direction[1] * ray.direction[0]
@@ -81,22 +82,27 @@ def TraceSpecular(edges):
             continue
 
         #find rayslope
-        rayDir = ray.direction[1]/ray.direction[0]
-        raym = ray.position[1] - rayDir* ray.position[0]
+        if sampleRay.direction[0] == 0.0:
+            sampleRay.direction[0] =0.01
+
+        raySlope = sampleRay.direction[1]/sampleRay.direction[0]
+        raym = sampleRay.origin[1] - raySlope* sampleRay.origin[0]
         #find segmentslope
         segSlope = (edge[1][1] - edge[0][1])/(edge[1][0] - edge[0][0])
-        segm = edge[1][1] - rayDir* edge[1][0]
+        segm = edge[1][1] - raySlope* edge[1][0]
 
+        iceptX = (raySlope - segSlope)/(segm - raym)
+        iceptY = raym + raySlope*iceptX
 
-        
-
-
-        pYpos =  edge[0][1] + (-edge[0][0] + xIndex)/(edge[1][0] - edge[0][0]) * (edge[1][1] - edge[0][1])
         slope = [(edge[0][1] - edge[1][1]),(edge[0][0] - edge[1][0])]
         normal = slope
         normal[0] = -normal[0]
 
-
+        lightDir = [lightPos[0] - iceptX,lightPos[1] - iceptY]
+        lightDir = vecNorm(lightDir)
+        factor = max(lightDir[0] * normal[0] + lightDir[1] * normal[1],0)
+        colors.append(255.0 * factor)
+    return colors
 
 
 def TraceDiffuse(edges):
@@ -144,7 +150,7 @@ def output(colors):
     y = [blank_image[0][i] for i in range(lenColors)]
     plt.scatter(x, y)
     plt.show()
-    cv2.imwrite('/Users/vincent/Desktop/c.png',blank_image)
+    cv2.imwrite('/Users/applekey/Desktop/c.png',blank_image)
 
     # cv2.imshow('image',blank_image)
     # cv2.waitKey(0)
