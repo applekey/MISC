@@ -33,8 +33,9 @@ def findCorrectEdgeRay(edges,ray):
     #construct aabb for each edge
     aabb = []
     for edge in edges:
-        minLeft = [min(edge[0][0],edge[1][0]), min(edge[0][1],edge[1][1])]
-        maxTop = [max(edge[0][0],edge[1][0]), max(edge[0][1],edge[1][1])]
+        minLeft = [min(edge[0][0],edge[1][0]), max(edge[0][1],edge[1][1])]
+        maxTop = [max(edge[0][0],edge[1][0]), min(edge[0][1],edge[1][1])]
+
 
         ## check if the ray intersects the aabb
         bottomIntersection = (minLeft[1] - ray.origin[1]) / ray.direction[1] * ray.direction[0]
@@ -43,6 +44,8 @@ def findCorrectEdgeRay(edges,ray):
         if ((bottomIntersection > minLeft[0] and bottomIntersection < maxTop[0])
             or(topIntersection > minLeft[0] and topIntersection < maxTop[0])):
 
+            # print ray.direction
+            #print edge[0][0]
             return edge
     print 'not found'
     return None
@@ -66,16 +69,17 @@ def TraceSpecular(edges):
     colors = []
     lightPos = [10,15]
     ## camera stuff
-    camPos = [15,0]
-    camNear = 5
-    camFov = 30.0
+    camPos = [0,20]
+    camNear = 3
+    camFov = 80.0
     for i in range(samples):
         angle = -camFov/2.0 + camFov/samples * float(i)
         direction = [math.sin(math.radians(angle)), - 1.0]
+        #print vecNorm(direction)
+        #print angle
         #create the ray
-        sampleRay = ray(camPos,vecNorm(direction))
+        sampleRay = ray(camPos,(direction))
 
-        xIndex = start + (end-start)/samples * i #+ random.uniform(0,0.3)
         edge = findCorrectEdgeRay(edges,sampleRay)
 
         if edge == None:
@@ -85,14 +89,20 @@ def TraceSpecular(edges):
         if sampleRay.direction[0] == 0.0:
             sampleRay.direction[0] =0.01
 
+        #print edge[0][0]
+
+
         raySlope = sampleRay.direction[1]/sampleRay.direction[0]
         raym = sampleRay.origin[1] - raySlope* sampleRay.origin[0]
         #find segmentslope
         segSlope = (edge[1][1] - edge[0][1])/(edge[1][0] - edge[0][0])
+        #print segSlope
         segm = edge[1][1] - raySlope* edge[1][0]
 
         iceptX = (raySlope - segSlope)/(segm - raym)
         iceptY = raym + raySlope*iceptX
+
+        #print iceptY
 
         slope = [(edge[0][1] - edge[1][1]),(edge[0][0] - edge[1][0])]
         normal = slope
