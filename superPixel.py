@@ -13,11 +13,13 @@ def CreateSurface():
     #draw half a sphere
     points = []
     radius = 15.0
-    granularity = 500
+    granularity = 1000
 
     anglePerSlice =  180.0/granularity
 
     for i in range(granularity):
+        # x = -50 + 100/granularity * i
+        # y = 10.0
         x = -math.cos(math.radians(i*anglePerSlice)) * radius
         y = math.sin(math.radians(i*anglePerSlice)) * radius
         points.append([x,y])
@@ -67,11 +69,11 @@ def TraceSpecular(edges):
     start = -10.0
     end = 10.0
     colors = []
-    lightPos = [-4,30]
+    lightPos = [-0,15]
     ## camera stuff
-    camPos = [0,25]
+    camPos = [0,40]
     camNear = 3
-    camFov = 80.0
+    camFov = 40.0
     for i in range(samples):
         angle = -camFov/2.0 + camFov/samples * float(i)
         direction = [math.sin(math.radians(angle)), - 1.0]
@@ -99,20 +101,25 @@ def TraceSpecular(edges):
         #print segSlope
         segm = edge[1][1] - segSlope* edge[1][0]
 
-        #print raySlope - segSlope
 
         iceptX = (segm - raym)/(raySlope - segSlope)
         iceptY = raym + raySlope*iceptX
 
-        slope = [(edge[1][0] - edge[0][0]),(edge[1][1] - edge[1][1])]
-        normal = slope
-        normal[0] = -normal[0]
+        slope = [(edge[1][0] - edge[0][0]),(edge[1][1] - edge[0][1])]
+        #print slope
+        normal = [-slope[1],slope[0]]
         normal = vecNorm(normal)
 
         lightDir = [lightPos[0] - iceptX,lightPos[1] - iceptY]
         lightDir = vecNorm(lightDir)
 
-        factor = max((lightDir[0] * normal[0] + lightDir[1] * normal[1]),0)
+
+
+        tmp = (lightDir[0] * normal[0] + lightDir[1] * normal[1])
+        print tmp
+        factor = max(-tmp,0)
+
+        #print normal[0]
 
         totalColor = 0
         #totalColor += 255.0 * factor ## lambert component
@@ -121,7 +128,7 @@ def TraceSpecular(edges):
         NdotI = -lightDir[0] * normal[0] - lightDir[1] * normal[1]
         reflectRay = [-lightDir[0] - 2*NdotI*normal[0] ,-lightDir[1] - 2*NdotI*normal[1]]
         tmp = sampleRay.direction[0] * reflectRay[0] + sampleRay.direction[1]* reflectRay[1]
-        reflectDotview = math.pow(tmp,1.7)
+        reflectDotview = math.pow(tmp,2)
         totalColor += min(255.0 * reflectDotview,255.0)
 
 
@@ -156,7 +163,7 @@ def TraceDiffuse(edges):
         colors.append(255.0 * factor)
     return colors
 
-def output(colors):
+def output(colors,location):
     lenColors = len(colors[0])
     height = 400
     blank_image = np.zeros((height,lenColors,1), np.uint8)
@@ -174,7 +181,7 @@ def output(colors):
     # y = [blank_image[0][i] for i in range(lenColors)]
     # plt.scatter(x, y)
     # plt.show()
-    cv2.imwrite('/Users/applekey/Desktop/c5.png',blank_image)
+    cv2.imwrite(location,blank_image)
 
     # cv2.imshow('image',blank_image)
     # cv2.waitKey(0)
@@ -200,5 +207,5 @@ def main():
         colors = TraceSpecular(edges)
         allColors.append(colors)
         edges = []
-    output(allColors)
+    output(allColors,'/Users/applekey/Desktop/c0.png')
 main()
