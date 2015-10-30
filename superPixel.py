@@ -67,7 +67,7 @@ def TraceSpecular(edges):
     start = -10.0
     end = 10.0
     colors = []
-    lightPos = [3,30]
+    lightPos = [-4,30]
     ## camera stuff
     camPos = [0,25]
     camNear = 3
@@ -112,8 +112,20 @@ def TraceSpecular(edges):
         lightDir = [lightPos[0] - iceptX,lightPos[1] - iceptY]
         lightDir = vecNorm(lightDir)
 
-        factor = max(-(lightDir[0] * normal[0] + lightDir[1] * normal[1]),0)
-        colors.append(255.0 * factor)
+        factor = max((lightDir[0] * normal[0] + lightDir[1] * normal[1]),0)
+
+        totalColor = 0
+        #totalColor += 255.0 * factor ## lambert component
+
+        ## calculate specular component
+        NdotI = -lightDir[0] * normal[0] - lightDir[1] * normal[1]
+        reflectRay = [-lightDir[0] - 2*NdotI*normal[0] ,-lightDir[1] - 2*NdotI*normal[1]]
+        tmp = sampleRay.direction[0] * reflectRay[0] + sampleRay.direction[1]* reflectRay[1]
+        reflectDotview = math.pow(tmp,1.7)
+        totalColor += min(255.0 * reflectDotview,255.0)
+
+
+        colors.append(totalColor)
     return colors
 
 
@@ -162,7 +174,7 @@ def output(colors):
     # y = [blank_image[0][i] for i in range(lenColors)]
     # plt.scatter(x, y)
     # plt.show()
-    cv2.imwrite('/Users/applekey/Desktop/c.png',blank_image)
+    cv2.imwrite('/Users/applekey/Desktop/c5.png',blank_image)
 
     # cv2.imshow('image',blank_image)
     # cv2.waitKey(0)
