@@ -67,9 +67,9 @@ def TraceSpecular(edges):
     start = -10.0
     end = 10.0
     colors = []
-    lightPos = [10,15]
+    lightPos = [3,30]
     ## camera stuff
-    camPos = [0,20]
+    camPos = [0,25]
     camNear = 3
     camFov = 80.0
     for i in range(samples):
@@ -104,14 +104,15 @@ def TraceSpecular(edges):
         iceptX = (segm - raym)/(raySlope - segSlope)
         iceptY = raym + raySlope*iceptX
 
-        slope = [(edge[0][1] - edge[1][1]),(edge[0][0] - edge[1][0])]
+        slope = [(edge[1][0] - edge[0][0]),(edge[1][1] - edge[1][1])]
         normal = slope
         normal[0] = -normal[0]
+        normal = vecNorm(normal)
 
         lightDir = [lightPos[0] - iceptX,lightPos[1] - iceptY]
         lightDir = vecNorm(lightDir)
 
-        factor = max(lightDir[0] * normal[0] + lightDir[1] * normal[1],0)
+        factor = max(-(lightDir[0] * normal[0] + lightDir[1] * normal[1]),0)
         colors.append(255.0 * factor)
     return colors
 
@@ -121,7 +122,7 @@ def TraceDiffuse(edges):
     start = -10.0
     end = 10.0
     colors = []
-    lightPos = [5,15]
+    lightPos = [20,15]
 
     for i in range(samples):
         xIndex = start + (end-start)/samples * i #+ random.uniform(0,0.3)
@@ -175,7 +176,7 @@ def main():
     plen = len(points)
     print plen
 
-    skip = 1
+    skip = 5
     for s in range(skip):
         for i in range(plen)[10+s::skip]:
             edges.append([points[i-skip],points[i]])
