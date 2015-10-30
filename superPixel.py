@@ -97,12 +97,12 @@ def TraceSpecular(edges):
         #find segmentslope
         segSlope = (edge[1][1] - edge[0][1])/(edge[1][0] - edge[0][0])
         #print segSlope
-        segm = edge[1][1] - raySlope* edge[1][0]
+        segm = edge[1][1] - segSlope* edge[1][0]
 
-        iceptX = (raySlope - segSlope)/(segm - raym)
+        #print raySlope - segSlope
+
+        iceptX = (segm - raym)/(raySlope - segSlope)
         iceptY = raym + raySlope*iceptX
-
-        #print iceptY
 
         slope = [(edge[0][1] - edge[1][1]),(edge[0][0] - edge[1][0])]
         normal = slope
@@ -110,6 +110,7 @@ def TraceSpecular(edges):
 
         lightDir = [lightPos[0] - iceptX,lightPos[1] - iceptY]
         lightDir = vecNorm(lightDir)
+
         factor = max(lightDir[0] * normal[0] + lightDir[1] * normal[1],0)
         colors.append(255.0 * factor)
     return colors
@@ -120,7 +121,7 @@ def TraceDiffuse(edges):
     start = -10.0
     end = 10.0
     colors = []
-    lightPos = [10,15]
+    lightPos = [5,15]
 
     for i in range(samples):
         xIndex = start + (end-start)/samples * i #+ random.uniform(0,0.3)
@@ -156,10 +157,10 @@ def output(colors):
         for j in range(height):
             blank_image[j][i] = color
 
-    x = [i for i in range(lenColors)]
-    y = [blank_image[0][i] for i in range(lenColors)]
-    plt.scatter(x, y)
-    plt.show()
+    # x = [i for i in range(lenColors)]
+    # y = [blank_image[0][i] for i in range(lenColors)]
+    # plt.scatter(x, y)
+    # plt.show()
     cv2.imwrite('/Users/applekey/Desktop/c.png',blank_image)
 
     # cv2.imshow('image',blank_image)
