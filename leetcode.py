@@ -1,69 +1,124 @@
 class Solution(object):
-    def recMidSearch(self,lista,listb,kthSmallest,firstTime):
-        print lista
-        print listb
-        lenA = len(lista)
-        lenB = len(listb)
-
-        if firstTime:
-            totalLength = lenA + lenB
-
-            if totalLength < kthSmallest +1:
-                print 'toolong ... thats what she said'
-                return
-
-            if kthSmallest == 0:
-                return lista[0] if lista[0]< listb[1] else listb[1]
-            if lenA < kthSmallest+1:
-                ka = lenA-1
-                kb = kthSmallest-ka -1
+    def mProfit(self,prices):
+        maxPrices = []
+        firstPrice = prices[0]
+        minPrice = firstPrice
+        maxDiff = 0
+        for price in prices[1:]:
+            if price < minPrice:
+                 minPrice = price
             else:
-                ka = kthSmallest/2
-                kb = kthSmallest - ka -1
-        else:
-            ka = lenA/2 -1
-            kb = lenB/2 -1
-
-
-        ## figure out that shit...
-        if lenA == lenB and lenA == 1:
-            ## which one do i return
-            return listb[0]
-
-        if lenA == 1:
-            print 'a'
-            print lista
-            print listb
-            return lista[-1] if lista[-1]> listb[-1] else listb[-1]
-        if lenB == 1:
-            print 'a'
-            print lista
-            print listb
-            return listb[-1] if lista[-1]> listb[-1] else lista[-1]
-            #return  lista
-        print str(ka) + '  ' + str(kb)
-        # k/2 elemnt for both
-        if lista[ka] < listb[kb]:
-            print 'dfd'
-            return self.recMidSearch(lista[ka:kthSmallest+1],listb[:kb+1],kthSmallest,False)
-        else:
-            print 'fdsa'
-            return self.recMidSearch(lista[:ka+1],listb[kb:kthSmallest+1],kthSmallest,False)
-
-    def findMedianSortedArrays(self, nums1, nums2,smallest):
+                diff = price-minPrice
+                if diff > maxDiff:
+                    maxDiff = diff
+            maxPrices.append(maxDiff)
+        return maxPrices
+    def maxProfit(self, prices):
         """
-        :type nums1: List[int]
-        :type nums2: List[int]
-        :rtype: float
+        :type prices: List[int]
+        :rtype: int
         """
-        return self.recMidSearch(nums1,nums2,smallest,True)
+        if len(prices) < 2 :
+            return 0
 
-## need to find the ith elemnt
 
-nums1 = [0, 2,4,6]
-nums2 = [-1,1,3,5,7,9]
+
+        foward = self.mProfit(prices)
+        foward = [0] + foward
+        rev = (self.mProfit(map(lambda x:-x,reversed(prices))))
+        rev = rev[::-1]
+        rev.append(0)
+
+        print foward
+        print rev
+
+        #combine the two
+        maxProfit = map (lambda x,y : x + y,foward[:-1],rev[:-1])
+
+        return max(maxProfit)
+
 a = Solution()
-print a.findMedianSortedArrays(nums1,nums2,1)
+print a.maxProfit([2,1,2,0,1])
+
+
+# class Solution(object):
+#     def recMidSearch(self,lista,listb,i,iend,j,jend,kthSmallest):
+#
+#         ## larger  always has to conform to the smaller
+#         imid =
+#         j = j-i
+#
+#
+#         if lista[imid] < listb[jmid]:
+#             return self.recMidSearch(lista,listb,imid,iend,j,jmid,kthSmallest)
+#         else:
+#             return self.recMidSearch(lista,listb,i,imid,jmid,jend,kthSmallest)
+#
+#     def findMedianSortedArrays(self, nums1, nums2,smallest):
+#         """
+#         :type nums1: List[int]
+#         :type nums2: List[int]
+#         :rtype: float
+#         """
+#         return self.recMidSearch(nums1,nums2,0,len(nums1) -1,0,len(nums2) - 1,smallest)
+#
+# ## need to find the ith elemnt
+#
+# nums1 = [0, 2,4,6]
+# nums2 = [-1,1,3,5,7,9]
+# a = Solution()
+# print a.findMedianSortedArrays(nums1,nums2,1)
+
+# class Solution(object):
+#     def maxProfit(self, prices):
+#         """
+#         :type prices: List[int]
+#         :rtype: int
+#         """
+#         if len(prices) == 0:
+#             return 0
+#
+#         profits = []
+#         buyPrice = prices[0]
+#         currentProfit = 0
+#
+#         allAdded = True
+#         lastprice = 0
+#
+#         for price in prices[1:]:
+#             lastprice = price
+#             if price > buyPrice:
+#                 currentProfit += price-buyPrice
+#                 allAdded = False
+#             else:
+#                 profits.append([currentProfit,price])
+#                 allAdded = True
+#                 currentProfit = 0
+#             buyPrice = price
+#
+#
+#         ## merge profits
+#         if allAdded == False:
+#             profits.append([currentProfit,price])
+#
+#
+#         profits = [prof for prof in profits if prof[0] != 0]
+#
+#         print profits
+#
+#
+#         if len(profits) == 0:
+#             return 0
+#         elif len(profits) == 1:
+#             return profits[0][0]
+#         elif len(profits) == 2:
+#             return profits[-1][0] + profits[-2][0]
+#         else:
+#             ## need to merge the lists
+#             for prof in profits:
+#
+#
+
 
 # class Solution(object):
 #     def nxtMoves(self,s,AorB):
