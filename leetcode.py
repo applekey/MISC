@@ -1,58 +1,142 @@
 class Solution(object):
-    def mProfit(self,prices):
-        maxPrices = []
-        firstPrice = prices[0]
-        minPrice = firstPrice
-        maxDiff = 0
-        for price in prices[1:]:
-            if price < minPrice:
-                 minPrice = price
-            else:
-                diff = price-minPrice
-                if diff > maxDiff:
-                    maxDiff = diff
-            maxPrices.append(maxDiff)
-        return maxPrices
-    def maxProfit(self, prices):
+    def maximalSquare(self, matrix):
         """
-        :type prices: List[int]
+        :type matrix: List[List[str]]
         :rtype: int
         """
-        if len(prices) < 2 :
+        if len(matrix) == 0:
             return 0
 
 
+        counts = [0] * len(matrix[0])
+        largest = 0
+        for row in matrix:
+            listToCheck = []
+            for index,col in enumerate(list(row)):
+                print counts
+                if col == '1':
+                    if largest == 0:
+                        largest = 1
 
-        foward = self.mProfit(prices)
-        foward = [0] + foward
-        rev = (self.mProfit(map(lambda x:-x,reversed(prices))))
-        rev = rev[::-1]
-        rev.append(0)
+                    currentHeight =  counts[index] +1
+                    counts[index] = currentHeight
 
-        print foward
-        print rev
 
-        #combine the two
-        maxProfit = map (lambda x,y : x + y,foward[:-1],rev[:-1])
 
-        return max(maxProfit)
+                    needed = currentHeight -1
+                    #print 'abc' +str(listToCheck) + 'sfda ' + str(needed)
+                    for prev in reversed(listToCheck):
+                        #if same height
+                        if prev >= currentHeight:
+                            needed -= 1
+                        else:
+                            needed -= currentHeight - prev
+                            currentHeight = prev
+                            needed -= 1
 
+                    if needed <= 0:
+                        if currentHeight > largest:
+                            largest = currentHeight
+
+                    listToCheck.append(counts[index])
+                else:
+                    listToCheck = []
+                    counts[index] = 0
+        return largest * largest
 a = Solution()
-print a.maxProfit([2,1,2,0,1])
-
+mat = ["0001","1101","1111","0111","0111"]
+print a.maximalSquare(mat)
 
 # class Solution(object):
-#     def recMidSearch(self,lista,listb,i,iend,j,jend,kthSmallest):
+#     def threeSum(self, nums):
+#         """
+#         :type nums: List[int]
+#         :type target: int
+#         :rtype: List[int]
+#         """
+#         mList = []
+#         lenList = len(nums)
+#         answers = []
+#
+#         for i in range(lenList):
+#             target = -nums[i]
+#             for j in range(i+1,lenList):
+#                 numj = nums[j]
+#                 difference = target - numj
+#                 if difference in mList:
+#                     ans = sorted([-target,numj,difference])
+#                     if ans not in answers:
+#                         answers.append(ans)
+#                 # not found, keep searching
+#                 else:
+#                     mList.append(numj)
+#         return answers
+#
+# a = Solution()
+# inputs = [-1,0,3,4,5,1,-3]
+# input = [-7,-10,-1,3,0,-7,-9,-1,10,8,-6,4,14,-8,9,-15,0,-4,-5,9,11,3,-5,-8,2,-6,-14,7,-14,10,5,-6,7,11,4,-7,11,11,7,7,-4,-14,-12,-13,-14,4,-13,1,-15,-2,-12,11,-14,-2,10,3,-1,11,-5,1,-2,7,2,-10,-5,-8,-10,14,10,13,-2,-9,6,-7,-7,7,12,-5,-14,4,0,-11,-8,2,-6,-13,12,0,5,-15,8,-12,-1,-4,-15,2,-5,-9,-7,12,11,6,10,-6,14,-12,9,3,-10,10,-8,-2,6,-9,7,7,-7,4,-8,5,-4,8,0,3,11,0,-10,-9]
+# print a.threeSum(input)
+
+# class Solution(object):
+#
+#     def threeSum(self, nums):
+#         """
+#         :type nums: List[int]
+#         :rtype: List[List[int]]
+#         """
+#
+#         nums = sorted(nums)
+#         totalLength = len(nums)
+#
+#         result =[]
+#
+#         for i in range(totalLength):
+#             if nums[i] > 0:
+#                 break
+#             for j in range(i+1,totalLength):
+#
+#                 secondSum = nums[i] + nums[j]
+#
+#                 if secondSum > 0:
+#                     break;
+#
+#                 diffToZero = 0 - secondSum
+#
+#                 if nums[j] > diffToZero:
+#                     break
+#
+#                 for k in range(j+1,totalLength):
+#                     thirdSum = nums[i] + nums[j] + nums[k]
+#
+#                     if thirdSum == 0:
+#                         newval = [nums[i],nums[j],nums[k]]
+#                         if not newval in result:
+#                             result.append(newval)
+#
+#         return result
+#
+# a = Solution()
+# input = [8,5,12,3,-2,-13,-8,-9,-8,10,-10,-10,-14,-5,-1,-8,-7,-12,4,4,10,-8,0,-3,4,11,-9,-2,-7,-2,3,-14,-12,1,-4,-6,3,3,0,2,-9,-2,7,-8,0,14,-1,8,-13,10,-11,4,-13,-4,-14,-1,-8,-7,12,-8,6,0,-15,2,8,-4,11,-4,-15,-12,5,-9,1,-2,-10,-14,-11,4,1,13,-1,-3,3,-7,9,-4,7,8,4,4,8,-12,12,8,5,5,12,-7,9,4,-12,-1,2,5,4,7,-2,8,-12,-15,-1,2,-11]
+# print a.threeSum(input)
+
+# class Solution(object):
+#     def recMidSearch(self,lista,listb,i,iend,j,jend,kthSmallest,firstTime,moveA):
 #
 #         ## larger  always has to conform to the smaller
-#         imid =
-#         j = j-i
 #
+#          if i ==  z
+#
+#
+#         if firstTime:
+#             ## find the smallest
+#
+#         imid = (i + iend) / 2
+#         jmid = (j + jend) / 2
 #
 #         if lista[imid] < listb[jmid]:
-#             return self.recMidSearch(lista,listb,imid,iend,j,jmid,kthSmallest)
+#             return self.recMidSearch(lista,listb,imid,iend,j,jmid,kthSmallest,False,moveA)
 #         else:
-#             return self.recMidSearch(lista,listb,i,imid,jmid,jend,kthSmallest)
+#             return self.recMidSearch(lista,listb,i,imid,jmid,jend,kthSmallest,False,moveA)
 #
 #     def findMedianSortedArrays(self, nums1, nums2,smallest):
 #         """
@@ -60,7 +144,9 @@ print a.maxProfit([2,1,2,0,1])
 #         :type nums2: List[int]
 #         :rtype: float
 #         """
-#         return self.recMidSearch(nums1,nums2,0,len(nums1) -1,0,len(nums2) - 1,smallest)
+#         moveA = True if len(nums1) < len(nums2) else False
+#
+#         return self.recMidSearch(nums1,nums2,0,len(nums1) -1,0,len(nums2) - 1,smallest,True,moveA)
 #
 # ## need to find the ith elemnt
 #
@@ -68,57 +154,6 @@ print a.maxProfit([2,1,2,0,1])
 # nums2 = [-1,1,3,5,7,9]
 # a = Solution()
 # print a.findMedianSortedArrays(nums1,nums2,1)
-
-# class Solution(object):
-#     def maxProfit(self, prices):
-#         """
-#         :type prices: List[int]
-#         :rtype: int
-#         """
-#         if len(prices) == 0:
-#             return 0
-#
-#         profits = []
-#         buyPrice = prices[0]
-#         currentProfit = 0
-#
-#         allAdded = True
-#         lastprice = 0
-#
-#         for price in prices[1:]:
-#             lastprice = price
-#             if price > buyPrice:
-#                 currentProfit += price-buyPrice
-#                 allAdded = False
-#             else:
-#                 profits.append([currentProfit,price])
-#                 allAdded = True
-#                 currentProfit = 0
-#             buyPrice = price
-#
-#
-#         ## merge profits
-#         if allAdded == False:
-#             profits.append([currentProfit,price])
-#
-#
-#         profits = [prof for prof in profits if prof[0] != 0]
-#
-#         print profits
-#
-#
-#         if len(profits) == 0:
-#             return 0
-#         elif len(profits) == 1:
-#             return profits[0][0]
-#         elif len(profits) == 2:
-#             return profits[-1][0] + profits[-2][0]
-#         else:
-#             ## need to merge the lists
-#             for prof in profits:
-#
-#
-
 
 # class Solution(object):
 #     def nxtMoves(self,s,AorB):
