@@ -13,7 +13,6 @@ class Solution(object):
         for row in matrix:
             listToCheck = []
             for index,col in enumerate(list(row)):
-                print counts
                 if col == '1':
                     if largest == 0:
                         largest = 1
@@ -29,10 +28,14 @@ class Solution(object):
                         #if same height
                         if prev >= currentHeight:
                             needed -= 1
+                            if needed == 0:
+                                break;
                         else:
                             needed -= currentHeight - prev
                             currentHeight = prev
                             needed -= 1
+                            if needed <= 0:
+                                break;
 
                     if needed <= 0:
                         if currentHeight > largest:
@@ -42,9 +45,10 @@ class Solution(object):
                 else:
                     listToCheck = []
                     counts[index] = 0
+            #print counts
         return largest * largest
 a = Solution()
-mat = ["0001","1101","1111","0111","0111"]
+mat = ["0001010","0100000","0101001","0011001","1111110","1001011","0100101","1101110","1010101","1110000"]
 print a.maximalSquare(mat)
 
 # class Solution(object):
