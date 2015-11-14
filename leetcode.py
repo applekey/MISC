@@ -1,55 +1,179 @@
+
 class Solution(object):
-    def maximalSquare(self, matrix):
+    def containsNearbyAlmostDuplicate(self, nums, k, t):
         """
-        :type matrix: List[List[str]]
-        :rtype: int
+        :type nums: List[int]
+        :type k: int
+        :type t: int
+        :rtype: bool
         """
-        if len(matrix) == 0:
-            return 0
 
 
-        counts = [0] * len(matrix[0])
-        largest = 0
-        for row in matrix:
-            listToCheck = []
-            for index,col in enumerate(list(row)):
-                if col == '1':
-                    if largest == 0:
-                        largest = 1
+# # Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+#
+# class Solution(object):
+#     def Slice(self, prev,sliceElement):
+#         tmp = prev.next
+#         prev.next = sliceElement
+#         sliceElement.next = tmp
+#
+#     def printList(self,lia):
+#         while lia!= None:
+#             print lia.val
+#             lia = lia.next
+#
+#     def reorderList(self, head):
+#         """
+#         :type head: ListNode
+#         :rtype: void Do not return anything, modify head in-place instead.
+#         """
+#         if head == None or head.next == None:
+#             return
+#
+#
+#         ## check if its even or odd
+#         frontHead = head
+#         curPtr = head.next
+#         prev = head
+#         count = 0
+#
+#         while True:
+#             count += 1
+#             prev = curPtr
+#             curPtr = curPtr.next
+#
+#             if curPtr == None:
+#                 break
+#             else:
+#                 curPtr.prev = prev
+#
+#         #self.printList(frontHead)
+#         half = count /2
+#         currentBack = prev ## this is the last pointer
+#
+#         for i in range(half):
+#             nxtPtr = frontHead.next
+#             self.Slice(frontHead,currentBack)
+#             currentBack = currentBack.prev
+#             frontHead = nxtPtr
+#
+#         if count %2 == 0:
+#             frontHead.next = None
+#         else:
+#             frontHead.next.next = None
+#
+#
+# a = ListNode(1)
+# b = ListNode(2)
+# c = ListNode(3)
+# d = ListNode(4)
+# e = ListNode(5)
+# f = ListNode(6)
 
-                    currentHeight =  counts[index] +1
-                    counts[index] = currentHeight
+# a.next = b
+# b.next = c
+# c.next = d
+# d.next = e
+# e.next = f
+
+
+aa = Solution()
+aa.reorderList(a)
+aa.printList(a)
+
+# abc = [3,5,6,2,5,4,19,5,6,7,12]
+# class Solution(object):
+#     def lengthOfLIS(self, nums):
+#         """
+#         :type nums: List[int]
+#         :rtype: int
+#         """
+#         lists = []
+#
+#         if len(nums) == 0:
+#             return 0
+#
+#         for num in nums:
+#             print lists
+#             if len(lists) == 0: #case 1
+#                 lists.append([num])
+#             elif num > lists[-1][-1]: # case 2 ,clone and append
+#                 prev = lists[-1]
+#                 newList = prev[:]
+#                 newList.append(num)
+#                 lists.append(newList)
+#             else: #potential case 3 , check previous
+#                 for alist in (lists):
+#                     if num < alist[-1]:
+#                         if len(alist) >1:
+#                             if alist[-2] == num:
+#                                 break;
+#
+#                         alist[-1] = num
+#                         break;
+#         return len(lists[-1])
+# a = Solution()
+# print  a.lengthOfLIS(abc)
 
 
 
-                    needed = currentHeight -1
-                    #print 'abc' +str(listToCheck) + 'sfda ' + str(needed)
-                    for prev in reversed(listToCheck):
-                        #if same height
-                        if prev >= currentHeight:
-                            needed -= 1
-                            if needed == 0:
-                                break;
-                        else:
-                            needed -= currentHeight - prev
-                            currentHeight = prev
-                            needed -= 1
-                            if needed <= 0:
-                                break;
 
-                    if needed <= 0:
-                        if currentHeight > largest:
-                            largest = currentHeight
-
-                    listToCheck.append(counts[index])
-                else:
-                    listToCheck = []
-                    counts[index] = 0
-            #print counts
-        return largest * largest
-a = Solution()
-mat = ["0001010","0100000","0101001","0011001","1111110","1001011","0100101","1101110","1010101","1110000"]
-print a.maximalSquare(mat)
+# class Solution(object):
+#     def maximalSquare(self, matrix):
+#         """
+#         :type matrix: List[List[str]]
+#         :rtype: int
+#         """
+#         if len(matrix) == 0:
+#             return 0
+#
+#
+#         counts = [0] * len(matrix[0])
+#         largest = 0
+#         for row in matrix:
+#             listToCheck = []
+#             for index,col in enumerate(list(row)):
+#                 if col == '1':
+#                     if largest == 0:
+#                         largest = 1
+#
+#                     currentHeight =  counts[index] +1
+#                     counts[index] = currentHeight
+#
+#
+#
+#                     needed = currentHeight -12
+#                     #print 'abc' +str(listToCheck) + 'sfda ' + str(needed)
+#                     for prev in reversed(listToCheck):
+#                         #if same height
+#                         if prev >= currentHeight:
+#                             needed -= 1
+#                             if needed == 0:
+#                                 break;
+#                         else:
+#                             needed -= currentHeight - prev
+#                             currentHeight = prev
+#                             needed -= 1
+#                             if needed <= 0:
+#                                 break;
+#
+#                     if needed <= 0:
+#                         if currentHeight > largest:
+#                             largest = currentHeight
+#
+#                     listToCheck.append(counts[index])
+#                 else:
+#                     listToCheck = []
+#                     counts[index] = 0
+#             #print counts
+#         return largest * largest
+# a = Solution()
+# mat = ["0001010","0100000","0101001","0011001","1111110","1001011","0100101","1101110","1010101","1110000"]
+# print a.maximalSquare(mat)
 
 # class Solution(object):
 #     def threeSum(self, nums):
