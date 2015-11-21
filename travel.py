@@ -3,7 +3,11 @@
 # Design:
 #       sql-db-engine to do heavy lifting for searching all avaliable deals for timeframe
 #       in-memory optimization to find best deal for applicable trip
+#       lightweight lru cache to store most hit trips
+#
 # Summary of code:
+#  LRUCACHE:
+#    -> check cache if trip already queried
 #  SQL:
 #      select * from deals where dealStartDate < tripStartDate and dealEndDate > tripStartDate orderby deal_type
 #  Memory:
@@ -199,10 +203,14 @@ class findDealAdapter:
 ### This class optimizes the avaliable deals that are applicapble given a
 ## certain timeframe
 class DealManager:
-    def __init__(self):
+    def __init__(self, enableCache = True):
         self.cityCache = CACHE(100)
         self.dealFinder = findDealAdapter()
         self.dirty = False
+        self.enableCache = enableCache
+        ## caching diagnosis
+        self.operations = 0
+        self.operationsThatHitCache = 0
 
     def insertData(self, columns, to_db):
         self.dealFinder.insertDeals(columns, to_db,'csv')
@@ -215,7 +223,7 @@ class DealManager:
         if hotelName in self.cityCache.dataCache:
             city = self.cityCache.dataCache[hotelName]
             if start_date in city.dataCache:
-                print 'found'
+                print 'Cache Hit'
                 return city.dataCache[start_date]
         return None
 
@@ -229,10 +237,13 @@ class DealManager:
             self.cityCache.set(hotelName,hotelDateCache)
 
     def BestDeal(self, hotelName, start_date,endDate):
-        cached = self.CheckIfCached(hotelName,start_date,endDate)
+        self.operations += 1
         duration = abs((endDate - start_date).days)
-        if cached != None:
-            return self.optimizeAvaliableDeals(hotelName,start_date,cached,duration,True)
+        if self.enableCache:
+            cached = self.CheckIfCached(hotelName,start_date,endDate)
+            if cached != None:
+                self.operationsThatHitCache += 1
+                return self.optimizeAvaliableDeals(hotelName,start_date,cached,duration,True)
         ### not in cache
         avaliableDeals = self.dealFinder.findDealBetweenTime(hotelName,start_date,endDate)
         results = self.optimizeAvaliableDeals(hotelName,start_date,avaliableDeals,duration,False)
@@ -253,7 +264,7 @@ class DealManager:
         else:
             groups = avaliableDeals
 
-        if len(groups)!= 0:
+        if len(groups)!= 0 and self.enableCache:
             self.CacheBestDeals(hotelName,start_date,groups)
 
         found = False
@@ -299,11 +310,11 @@ def main():
     #READ IN DEALS
     to_db,columns = parseCSV('travel.csv')
 
-    manager = DealManager()
+    manager = DealManager(enableCache = True)
     manager.insertData(columns,to_db)
 
     #PARSE DEALS
-    trip = 'Hotel Foobar, 2016-03-10,2'
+    trip = 'Hotel Foobar, 2016-03-5,3'
     tripArgs = parseInput (trip)
 
     #FIND THE BEST DEAL
