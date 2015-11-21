@@ -1,12 +1,75 @@
-
+class TreeNode(object):
+    def __init__(self, x):
+        self.val = x
+        self.left = None
+        self.right = None
+        
 class Solution(object):
-    def containsNearbyAlmostDuplicate(self, nums, k, t):
+    def maxPathSum(self, root):
         """
-        :type nums: List[int]
-        :type k: int
-        :type t: int
-        :rtype: bool
+        :type root: TreeNode
+        :rtype: int
         """
+
+# class Solution(object):
+#     def largestRectangleArea(self, height):
+#         """
+#         :type height: List[int]
+#         :rtype: int
+#         """
+#         biggestArea = -1
+#         hstack = [(-9999,0)]
+#         for index, h in enumerate(height):
+#             if h > hstack[-1][0]: #push onto stack
+#                 hstack.append((h,index))
+#                 if h > biggestArea:
+#                     biggestArea = h
+#
+#             elif h == hstack[-1][0]:
+#                 nth = hstack[-1][1]+1
+#                 hstack.append((h,nth))
+#                 newArea = h * nth
+#                 if newArea > biggestArea:
+#                     biggestArea = newArea
+#
+#             else: # new to deque until we find the right one
+#                 while hstack[-1][0] > h and len(hstack) > 0:
+#                     hstack.pop(1)
+#                 # find the prev
+#                 if len(hstack) > 0:
+#                     prev
+#                 else:
+#                     hstack.append((h,index))
+#                     if h > biggestArea:
+#                         biggestArea = h
+#
+#         return biggestArea
+#
+# a = Solution()
+# a.largestRectangleArea([2,1,5,6,2,3])
+
+# class Solution(object):
+#     def reverseWords(self, s):
+#         """
+#         :type s: str
+#         :rtype: str
+#         """
+#         rtr = ''
+#         for word in reversed(s.split()):
+#             rtr += word + ' '
+#         return rtr[:-1:]
+#
+# a = Solution()
+# print a.reverseWords('  a   b  ')
+# #Contains Duplicate III
+# class Solution(object):
+#     def containsNearbyAlmostDuplicate(self, nums, k, t):
+#         """
+#         :type nums: List[int]
+#         :type k: int
+#         :type t: int
+#         :rtype: bool
+#        """
 
 
 # # Definition for singly-linked list.
@@ -81,9 +144,9 @@ class Solution(object):
 # e.next = f
 
 
-aa = Solution()
-aa.reorderList(a)
-aa.printList(a)
+# aa = Solution()
+# aa.reorderList(a)
+# aa.printList(a)
 
 # abc = [3,5,6,2,5,4,19,5,6,7,12]
 # class Solution(object):

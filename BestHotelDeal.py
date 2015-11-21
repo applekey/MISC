@@ -14,8 +14,7 @@
 #   -> group all deals deal_type, find best discout by deal
 #   -> Find best deal type to use
 
-
-import csv, sqlite3, sys
+import csv, sqlite3, sys, os
 from datetime import datetime,timedelta
 from itertools import groupby
 
@@ -42,16 +41,6 @@ class CACHE:
         self.dataCache[key] = value
         self.lruCount[key] = self.currentCount
         self.currentCount += 1
-
-##class to generate a testing dataset
-class testing:
-    def generateDataSet(self):
-        #hotel_name,nightly_rate,promo_txt,deal_value,deal_type,start_date,end_date
-        str ='''hotel_name NVARCHAR(100),nightly_rate INT,promo_txt NVARCHAR(100),deal_value INT,deal_type NVARCHAR(100),start_date DATETIME ,end_date DATETIME\n
-        Hotel Foobar,250,$50 off your stay 3 nights or more,-50,rebate_3plus,2016-03-01,2016-03-31\n
-        Hotel Foobar,250,5% off your stay,-5,pct,2016-03-01,2016-03-15\n
-        Hotel Foobar,250,$20 off your stay,-20,rebate,2016-03-07,2016-03-15\n'''
-        return str
 
 ##class that finds the deal given a dataset and a trip
 class Logging:
@@ -152,7 +141,7 @@ class sqlLiteManager:
             return None
         try:
             c = self.connection.cursor()
-            result =  c.execute(querry)
+            result = c.execute(querry)
         except ex:
             Logging.Log(2,'Execute Exception:' + querry,ex)
             raise Exception('Execute Querry Exception')
@@ -215,6 +204,7 @@ class DealManager:
     def insertData(self, columns, to_db):
         self.dealFinder.insertDeals(columns, to_db,'csv')
         self.dirty = True
+        self.cityCache = CACHE(100)
 
     def CheckIfCached(self,hotelName, start_date, duration):
         if self.dirty == True:
@@ -231,7 +221,6 @@ class DealManager:
         if hotelName in self.cityCache.dataCache:
             self.cityCache.dataCache[hotelName].set(date,bestDeals)
         else:
-            print self.cityCache.dataCache
             hotelDateCache = CACHE(1000)
             hotelDateCache.set(date,bestDeals)
             self.cityCache.set(hotelName,hotelDateCache)
@@ -252,8 +241,10 @@ class DealManager:
 
     ## reduced: from cache, already reduced just find min
     def optimizeAvaliableDeals(self, hotelName,start_date, avaliableDeals, duration, reduced = False):
-        if avaliableDeals == None:
+        if avaliableDeals == None :
             return 'None'
+
+        notFound = ('*', 'no deal available')
         #pct percentage
         #rebate
         #rebase, 3 nits or more
@@ -266,6 +257,9 @@ class DealManager:
 
         if len(groups)!= 0 and self.enableCache:
             self.CacheBestDeals(hotelName,start_date,groups)
+
+        if groups == None or len(groups) == 0:
+            return notFound
 
         found = False
         for group in groups:
@@ -286,11 +280,11 @@ class DealManager:
                 if bestPrice[0] > totaPrice:
                     bestPrice = (totaPrice,bestOptionForType[1])
             else:
-                bestPrice = ('*', 'nodeals')
+                bestPrice = notFound
         return bestPrice
 ########################################################################################
 
-def parseInput(mInput):
+def parseParms(mInput):
     parms = mInput.split(',')
     hotelName = parms[0]
     checkInDate = parms[1].replace(' ','')
@@ -306,20 +300,59 @@ def parseCSV(csvData):
         to_db = [[i[col] for col in columns] for i in dictrdr]
     return to_db, columns
 
-def main():
-    #READ IN DEALS
-    to_db,columns = parseCSV('travel.csv')
+def parseInput(inputArgs):
+    args  = len(inputArgs)
+    if not args ==  5:
+        print 'Invalid format, it should be : BestHotelDeal ./deals.csv "Hotel Foobar" 2016-03-14 3'
+        exit()
+    args = list(sys.argv)
 
+    args = args[1:]
+    csvFileName = args[0]
+    args = args[1:]
+
+    ## test for duration
+    try:
+        duration = str(args[2])
+        if int(duration) <= 0:
+            print 'invalid duration'
+            exit()
+    except:
+        print 'duration must be an int'
+        exit()
+
+    ## test to see if datetime is correct format
+    dateInput = args[1]
+    try:
+        d = datetime.strptime(dateInput, "%Y-%m-%d")
+    except:
+        print 'invalid date time format'
+        exit()
+
+    ## test for csv exist
+    if not os.path.isfile(csvFileName):
+        print 'csv File name not exist'
+        exit()
+
+    trip = ",".join(args)
+    return csvFileName,trip
+
+if __name__ == '__main__':
+    csvFileName,trip = parseInput(sys.argv)
+
+    #READ IN DEALS
+    to_db,columns = parseCSV(csvFileName)
     manager = DealManager(enableCache = True)
     manager.insertData(columns,to_db)
 
     #PARSE DEALS
-    trip = 'Hotel Foobar, 2016-03-5,3'
-    tripArgs = parseInput (trip)
+    tripArgs = parseParms (trip)
 
     #FIND THE BEST DEAL
-    print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])
-    print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])
-    print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])
+    print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])[1]
 
-main()
+    ## some code to test cache hit/miss
+    # print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])
+    # print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])
+    # manager.insertData(columns,to_db)
+    # print manager.BestDeal(tripArgs[0],tripArgs[1],tripArgs[2])

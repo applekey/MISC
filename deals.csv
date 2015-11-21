@@ -1,0 +1,4 @@
+hotel_name NVARCHAR(100),nightly_rate INT,promo_txt NVARCHAR(100),deal_value INT,deal_type NVARCHAR(100),start_date DATETIME ,end_date DATETIME
+Hotel Foobar,250,$50 off your stay 3 nights or more,-50,rebate_3plus,2016-03-01,2016-03-31
+Hotel Foobar,250,5% off your stay,-5,pct,2016-03-01,2016-03-15
+Hotel Foobar,250,$20 off your stay,-20,rebate,2016-03-07,2016-03-15
