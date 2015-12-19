@@ -66,11 +66,12 @@ class NumArray(object):
                     sum += self.values[lvlIndex]
                     #print 'exit' + str(currentIndex) + 'fdsa' +str(levels - 1)
                 currentIndex = left + pow(2,levels)
-                print currentIndex
+                #print currentIndex
 
                 #print currentIndex
             left = currentIndex
-        print 'sum is ' + str(sum)
+        #print 'sum is ' + str(sum)
+        return sum
 
     def printTree(self):
         for k in range(len(self.indexes)-1):
