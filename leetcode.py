@@ -1,15 +1,108 @@
-class TreeNode(object):
-    def __init__(self, x):
-        self.val = x
-        self.left = None
-        self.right = None
-        
-class Solution(object):
-    def maxPathSum(self, root):
+class NumArray(object):
+    def myLevelConstructor(self, values, indexes, currentWorkingCount):
+        if currentWorkingCount <2:
+            return
+
+        ## startAtEndOf 0, 8, prev index -2
+
+        workingIndex = indexes[-2]
+        workingIndex +=1
+        newElementsAdded = 0
+        while workingIndex < indexes[-1]:
+            values.append(values[workingIndex-1] + values[workingIndex])
+            workingIndex += 2
+            newElementsAdded += 1
+
+        if workingIndex == indexes[-1]:
+            values.append(values[workingIndex - 1])
+            newElementsAdded +=1
+        indexes.append(indexes[-1] + newElementsAdded)
+        self.myLevelConstructor(values,indexes, newElementsAdded)
+
+    def __init__(self, nums):
         """
-        :type root: TreeNode
-        :rtype: int
-        """
+            initialize your data structure here.
+            :type nums: List[int]
+            """
+        self.values = []
+        for num in nums:
+            self.values.append(num)
+        self.indexes = [0,len(nums)] ## index tracker
+        self.myLevelConstructor(self.values,self.indexes,len(nums))
+
+
+    def update(self, i, val):
+        difference = val - self.values[i]
+        division = 1
+        for k in range(1, len(self.indexes)):
+            index =  i / division + self.indexes[k-1]
+            self.values[index] += difference
+            division *= 2
+
+    def sumRange(self, i, j):
+        if i < 0:
+            return 0
+        if j >= self.indexes[1]:
+            return 0
+        # go right
+        sum = 0
+        left = i
+
+        while left <= j:
+            divisor = 2
+            levels = 0
+            currentIndex = left
+            canGoRight = True
+            while canGoRight:
+                if left % divisor == 0 and currentIndex <= j:
+                    divisor *=2
+                    levels += 1
+                else:
+                    canGoRight = False
+                    lvlIndex = self.indexes[levels] + left / pow(2,levels)
+                    print lvlIndex
+                    sum += self.values[lvlIndex]
+                #print levels
+                currentIndex = left + pow(2,levels)
+                #print currentIndex
+
+            left = currentIndex
+        print sum
+
+    def printTree(self):
+        for k in range(len(self.indexes)-1):
+            for i in range(self.indexes[k],self.indexes[k+1]):
+                print self.values[i],
+            print '\n'
+
+
+
+nums = [1,2,3,4,5,6,7,8]
+numAr = NumArray(nums)
+# numAr.printTree()
+#numAr.update(0,3)
+# numAr.printTree()
+numAr.sumRange(0,2)
+
+
+
+
+#pos[0].xy = pos[0].xy + pl*( (e2.xy/dot(e2.xy,n0.xy)) + (e0.xy/dot(e0.xy,n2.xy)) );
+#    pos[1].xy = pos[1].xy + pl*( (e0.xy/dot(e0.xy,n1.xy)) + (e1.xy/dot(e1.xy,n0.xy)) );
+#    pos[2].xy = pos[2].xy + pl*( (e1.xy/dot(e1.xy,n2.xy)) + (e2.xy/dot(e2.xy,n1.xy)) );
+#
+#class TreeNode(object):
+#    def __init__(self, x):
+#        self.val = x
+#        self.left = None
+#        self.right = None
+#
+#class Solution(object):
+#    def maxPathSum(self, root):
+#        """
+#        :type root: TreeNode
+#        :rtype: int
+#        """
 
 # class Solution(object):
 #     def largestRectangleArea(self, height):
