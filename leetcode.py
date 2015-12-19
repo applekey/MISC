@@ -50,24 +50,27 @@ class NumArray(object):
 
         while left <= j:
             divisor = 2
-            levels = 0
-            currentIndex = left
+            levels = 1
+            currentIndex = left + 1
             canGoRight = True
             while canGoRight:
-                if left % divisor == 0 and currentIndex <= j:
-                    divisor *=2
+                if left % divisor == 0 and currentIndex < j:
+                    divisor *= 2
                     levels += 1
                 else:
                     canGoRight = False
+                    #the previous level is the right one
+                    levels -= 1
                     lvlIndex = self.indexes[levels] + left / pow(2,levels)
-                    print lvlIndex
+                    #print lvlIndex
                     sum += self.values[lvlIndex]
-                #print levels
+                    #print 'exit' + str(currentIndex) + 'fdsa' +str(levels - 1)
                 currentIndex = left + pow(2,levels)
-                #print currentIndex
+                print currentIndex
 
+                #print currentIndex
             left = currentIndex
-        print sum
+        print 'sum is ' + str(sum)
 
     def printTree(self):
         for k in range(len(self.indexes)-1):
@@ -79,10 +82,9 @@ class NumArray(object):
 
 nums = [1,2,3,4,5,6,7,8]
 numAr = NumArray(nums)
-# numAr.printTree()
-#numAr.update(0,3)
-# numAr.printTree()
-numAr.sumRange(0,2)
+
+numAr.sumRange(1,7)
+
 
 
 
