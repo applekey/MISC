@@ -1,90 +1,183 @@
-class NumArray(object):
-    def myLevelConstructor(self, values, indexes, currentWorkingCount):
-        if currentWorkingCount <2:
-            return
-
-        ## startAtEndOf 0, 8, prev index -2
-
-        workingIndex = indexes[-2]
-        workingIndex +=1
-        newElementsAdded = 0
-        while workingIndex < indexes[-1]:
-            values.append(values[workingIndex-1] + values[workingIndex])
-            workingIndex += 2
-            newElementsAdded += 1
-
-        if workingIndex == indexes[-1]:
-            values.append(values[workingIndex - 1])
-            newElementsAdded +=1
-        indexes.append(indexes[-1] + newElementsAdded)
-        self.myLevelConstructor(values,indexes, newElementsAdded)
-
-    def __init__(self, nums):
-        """
-            initialize your data structure here.
-            :type nums: List[int]
-            """
-        self.values = []
-        for num in nums:
-            self.values.append(num)
-        self.indexes = [0,len(nums)] ## index tracker
-        self.myLevelConstructor(self.values,self.indexes,len(nums))
-
-
-    def update(self, i, val):
-        difference = val - self.values[i]
-        division = 1
-        for k in range(1, len(self.indexes)):
-            index =  i / division + self.indexes[k-1]
-            self.values[index] += difference
-            division *= 2
-
-    def sumRange(self, i, j):
-        if i < 0:
-            return 0
-        if j >= self.indexes[1]:
-            return 0
-        # go right
-        sum = 0
-        left = i
-
-        while left <= j:
-            divisor = 2
-            levels = 1
-            currentIndex = left + 1
-            canGoRight = True
-            while canGoRight:
-                if left % divisor == 0 and currentIndex < j:
-                    divisor *= 2
-                    levels += 1
-                else:
-                    canGoRight = False
-                    #the previous level is the right one
-                    levels -= 1
-                    lvlIndex = self.indexes[levels] + left / pow(2,levels)
-                    #print lvlIndex
-                    sum += self.values[lvlIndex]
-                    #print 'exit' + str(currentIndex) + 'fdsa' +str(levels - 1)
-                currentIndex = left + pow(2,levels)
-                #print currentIndex
-
-                #print currentIndex
-            left = currentIndex
-        #print 'sum is ' + str(sum)
-        return sum
-
-    def printTree(self):
-        for k in range(len(self.indexes)-1):
-            for i in range(self.indexes[k],self.indexes[k+1]):
-                print self.values[i],
-            print '\n'
+# class Solution(object):
+#     def smallerHelper(self, input, left ,right):
+#         if (left-right)== 0:
+#             return [input[left]], [0]
+#         mid = (left+right)/2
+#         rRight,subSmallRight = self.smallerHelper(input, mid+1, right) # right b
+#         rLeft,subSmallLeft = self.smallerHelper(input, left, mid) # left rX
+#
+#         ## merging step
+#         twoSubStep = []
+#         sortedSubArray = []
+#         rightIndex= 0
+#         while len(rLeft) > 0 or  len(rRight) > 0:
+#              if len(rLeft)== 0:
+#                  sortedSubArray += rRight
+#                  twoSubStep += subSmallRight
+#                  break
+#              if len(rRight) ==0:
+#                  sortedSubArray += rLeft
+#                  twoSubStep += [small + rightIndex for small in subSmallLeft]
+#                  break;
+#
+#              if rLeft[0] < rRight[0]: # left < right
+#                 #deque rX
+#                 sortedSubArray.append(rLeft.pop(0))
+#                 twoSubStep.append(subSmallLeft.pop(0) + rightIndex)
+#              else:
+#                 sortedSubArray.append(rRight.pop(0))
+#                 twoSubStep.append(subSmallRight.pop(0))
+#                 rightIndex += 1
+#         #print sortedSubArray, twoSubStep
+#         return sortedSubArray, twoSubStep
+#
+#     def countSmaller(self, nums):
+#         if len(nums) == 0:
+#             return []
+#         sortedIn, smallThan  = self.smallerHelper(nums,0,len(nums) -1)
+#         result = []
+#         for elem in nums:
+#             index = sortedIn.index(elem)
+#             result.append(smallThan[index])
+#         return result
+#
+# a = Solution()
+# small = [6,5,4,3,2,1,0]
+# print a.countSmaller(small)
 
 
+# # Enter your code here. Read input from STDIN. Print output to STDOUT
+# import sys
+# def accumu(lis,operator):
+#     total = 0
+#     for x in lis:
+#         total += x
+#         yield total % operator
+#
+# def minus(lis, start, minValue,operator):
+#     minMax = 0
+#     for i in range(start, len(lis)):
+#         val = (lis[i] - lis[start-1]) % operator
+#         if val > minMax:
+#             minMax = val
+#         lis[i] = val
+#     return minMax
+#
+# # inputs = []
+# # operators =[]
+# # for i, line in enumerate(sys.stdin):
+# #     if i % 2 == 0 and i != 0:
+# #         aInputs = line.split()
+# #         aInputs = [int(ainput) for ainput in aInputs]
+# #         inputs.append(aInputs)
+# #     if i % 2 == 1:
+# #         aInput = line.split()[1]
+# #         operators.append(int(aInput))
+#
+# # debug stuff
+# inputs = [[3, 3, 9 ,9, 5]]
+# operators = [7]
+#
+# for index, inputList in enumerate(inputs):
+#     #construct prefix sum fowards
+#     fowardSum = list(accumu(inputList,operators[index]))
+#     totalMax = max(fowardSum)
+#     for i in range(1,len(fowardSum)):
+#         localMax = minus(fowardSum, i ,fowardSum[i-1],operators[index])
+#         if localMax > totalMax:
+#             totalMax = localMax
+#     print totalMax
 
-nums = [1,2,3,4,5,6,7,8]
-numAr = NumArray(nums)
 
-numAr.sumRange(1,7)
+
+#
+# class NumArray(object):
+#     def myLevelConstructor(self, values, indexes, currentWorkingCount, operator):
+#         if currentWorkingCount <2:
+#             return
+#
+#         ## startAtEndOf 0, 8, prev index -2
+#
+#         workingIndex = indexes[-2]
+#         workingIndex +=1
+#         newElementsAdded = 0
+#         while workingIndex < indexes[-1]:
+#             values.append((values[workingIndex-1] + values[workingIndex]) % operator)
+#             workingIndex += 2
+#             newElementsAdded += 1
+#
+#         if workingIndex == indexes[-1]:
+#             values.append(values[workingIndex - 1])
+#             newElementsAdded +=1
+#         indexes.append(indexes[-1] + newElementsAdded)
+#         self.myLevelConstructor(values,indexes, newElementsAdded, operator)
+#
+#     def __init__(self, nums, operator):
+#         """
+#             initialize your data structure here.
+#             :type nums: List[int]
+#             """
+#         self.operator = operator
+#         for index, val in enumerate(nums):
+#             nums[index] = nums[index] % operator
+#         self.values = []
+#         for num in nums:
+#             self.values.append(num)
+#         self.indexes = [0,len(nums)] ## index tracker
+#         self.myLevelConstructor(self.values,self.indexes,len(nums),operator)
+#
+#
+#
+#     def update(self, i, val):
+#         difference = val - self.values[i]
+#         division = 1
+#         for k in range(1, len(self.indexes)):
+#             index =  i / division + self.indexes[k-1]
+#             self.values[index] += difference
+#             division *= 2
+#
+#     def sumRange(self, i, j):
+#         if i < 0:
+#             return 0
+#         if j >= self.indexes[1]:
+#             return 0
+#         # go right
+#         sum = 0
+#         left = i
+#
+#         while left <= j:
+#             divisor = 2
+#             levels = 1
+#             currentIndex = left + 1
+#             canGoRight = True
+#             while canGoRight:
+#                 if left % divisor == 0 and currentIndex < j:
+#                     divisor *= 2
+#                     levels += 1
+#                 \
+#                 #print currentIndex
+#
+#                 #print currentIndex
+#             left = currentIndex
+#         #print 'sum is ' + str(sum)
+#         return sum
+#
+#     def printTree(self):
+#         for k in range(len(self.indexes)-1):
+#             for i in range(self.indexes[k],self.indexes[k+1]):
+#                 print self.values[i],
+#             print '\n'
+#
+#     def prefixSum():
+#         self.prefixSum = []
+#
+#
+#
+#
+# nums = [3, 3, 9, 9, 5]
+# numAr = NumArray(nums,7)
+#
+# print numAr.sumRange(0,1)
 
 
 
